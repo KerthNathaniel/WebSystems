@@ -1,0 +1,105 @@
+.container{
+    display: flex;
+    justify-content: center;
+}
+
+/* Content */
+.content{
+    width: 100%;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.content h1 {
+    font-size: 75px;
+    margin-bottom: 20px;
+}
+
+.content p {
+    font-size: 20px;
+    max-width: 700px;
+    margin: 5px;
+    line-height: 1.6;
+}
+
+.content-buttons button{
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+.content-buttons button a{
+    text-decoration: none;
+    color: white;
+}
+
+.content-buttons button:hover{
+    background: white;
+    color: rgb(48, 9, 139);
+}
+
+.content-buttons button a:hover{
+    color: rgb(48, 9, 139);
+}
+
+/* Contacts */
+
+.contact{
+    width: 500px;
+    height: 300px;
+    position: absolute;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0, 0, 30px rgba(131, 4, 78, 0.5);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.contact ul{
+    list-style-type: none;
+    align-self: flex-start;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact ul li{
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 80%;
+    height: 40px;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+}
+
+.closecntct{
+    color: white;
+    font-size: 2em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    background: rgb(80, 5, 179);
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    border-bottom-left-radius: 18px;
+    z-index: 1;
+}

@@ -1,0 +1,29 @@
+.container{
+    display: flex;
+    justify-content: center;
+}
+
+.activities-content{
+    width: 95%;
+}
+
+.activities-inline{
+    display: flex;
+}
+.activities{
+    border: 2px solid;
+    border-radius: 10px;
+    width: 50%;
+    height: 300px;
+    margin: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.activities a{
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+}
+

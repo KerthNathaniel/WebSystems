@@ -1,0 +1,222 @@
+*{
+    box-sizing: border-box;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body{
+    min-height: 100vh;
+    background-image: url('images/bg/background_oks.png') no-repeat;
+    background-size: 80% 80%; 
+    background-color: rgb(48, 9, 139);
+    background-position-y: bottom;
+    background-position-x: right;
+}
+
+.topBar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgb(48, 9, 139);
+}
+
+.logo{
+    font: 2em;
+    color: white;
+}
+
+.navbar ul li{
+    list-style-type: none;
+    display: inline-block;
+}
+.navbar a{
+    text-decoration: none;
+    color: white;
+    margin-right: 15px;
+    font-size: 1.1em;
+    font-weight: 500;
+    position: relative;
+}
+
+.navbar a::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 5px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+.navbar a:hover::after{
+    transform-origin: left;
+    transform: scaleX(1);
+
+}
+.navbar .loginbtn{
+    width: 130px;
+    height: 50px;
+    background: transparent;
+    border: 2px solid;
+    outline: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: white;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.navbar .loginbtn:hover{
+    background: white;
+    color: black;
+}
+
+/* Login */
+.formContainer{
+    width: 400px;
+    height: 450px;
+    position: absolute;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0, 0, 30px rgba(131, 4, 78, 0.5);
+    visibility: hidden;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.formContainer .loginForm-login{
+    width: 100%;
+    padding: 40px;
+}
+
+
+.loginForm-login h2{
+    font-size: 2em;
+    text-align: center;
+    color: white;
+}
+
+.formContainer .input_box{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    border-bottom: 2px solid #fff;
+    margin: 30px 0;
+
+}
+
+.input_box label{
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform:translateY(-50%);
+    font-size: 1em;
+    font-weight: 500;
+    pointer-events: none;
+    transition: .5s;
+    color: #fff;
+
+}
+
+.input_box input:focus~label,
+.input_box input:valid~label{
+    top: -5px;
+}
+
+.input_box input{
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    color: rgb(255, 255, 255);
+    font-weight: 600;  
+    padding: 0 33px 0 5px;
+
+}
+
+.remember-forgot{
+    font-size: .9em;
+    font-weight: 500;
+    margin: -15px 0 15px;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    
+}
+
+.remember-forgot label input{
+    margin-right: 3px;
+}
+
+.remember-forgot a{
+    text-decoration: none;
+    color: white;
+
+
+}
+
+.remember-forgot a:hover{
+    text-decoration: underline;
+}
+
+.btn{
+    height: 50px;
+    width: 100%;
+    color: rgb(255, 255, 255);
+    border-color: white;
+    background-color: transparent;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: .5s;
+    font-weight: 600;
+}
+
+.btn:hover{
+    background: rgb(255, 255, 255);
+    color: black;
+}
+
+.login-register{
+    color: white;
+    text-align: center;
+    font-size: .9em;
+    font-weight: 500;
+    margin: 25px 0 10px;
+}
+
+.login-register a{
+    color: #fff;
+    text-decoration: none;
+    margin: 10px;
+}
+
+.login-register a:hover{
+    text-decoration: underline;
+}
+
+.closelogin{
+    color: white;
+    font-size: 2em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    background: rgb(80, 5, 179);
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    border-bottom-left-radius: 18px;
+    z-index: 1;
+}

@@ -1,0 +1,15 @@
+.about-content{
+    font-size: 1.5em;
+    color: white;
+}
+
+.about-content .developers{
+   display: flex; 
+   flex-direction: column;
+   align-items: center;
+}
+
+.about-content ul li{
+    margin-bottom: 20px;
+    list-style-type: none;
+}
