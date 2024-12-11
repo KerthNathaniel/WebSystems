@@ -1,0 +1,1 @@
+For displaying profile pic: <?php echo $profile_image ? $profile_image : 'default-image.jpg'; ?>

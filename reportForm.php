@@ -56,7 +56,7 @@
     <div class="overlay" id="overlay"></div>
     <div class="popup" id="popup">
         <p>YOUR REPORT HAS BEEN SENT TO US. PLEASE BE ASSURED WE WILL RELAY IT TO THE AUTHORITIES AND CONDUCT PROPER INVESTIGATION. THANK YOU FOR KEEPING OUR MARINE ECOSYSTEM HEALTHY AND SAFE.</p>
-        <div class="popup-close" onclick="closePopup()"><a href="report.html">&times;</a></div>
+        <div class="popup-close" onclick="closePopup()"><a href="report.php">&times;</a></div>
     </div>
 
     <script>

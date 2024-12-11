@@ -43,13 +43,16 @@
       <span class="closelogin" onclick="closeForm()">&times</span>
       <div class="loginForm-login">
         <h2>LOGIN</h2>
-        <form action="">
+        <?php if(isset($_GET['error'])){ ?>
+            <p class="error"><?php echo $_GET['error']; ?></p>
+        <?php } ?>
+        <form action="login.php" method="POST">
           <div class="input_box">
-            <input type="email" required>
+            <input type="email" name="email" required>
             <label for="email">EMAIL</label>
           </div>
           <div class="input_box">
-            <input type="password" required>
+            <input type="password" name="password" required>
             <label for="password">PASSWORD</label>
           </div>
           <div class="remember-forgot">
