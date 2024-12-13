@@ -6,6 +6,40 @@
   <title>ACTIVITIES</title>
   <link rel="stylesheet" href="css/navBar.css">
   <link rel="stylesheet" href="css/activities.css">
+  <style>
+      .activities-content {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: flex-start;
+          margin-top: 20px;
+      }
+      .activities-inline {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 45%;
+          margin: 10px;
+      }
+      .activities {
+          border: 2px solid white; /* White border */
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+          width: 100%;
+          margin-bottom: 20px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          background-color: transparent; /* No fill */
+      }
+      .activities a {
+          text-decoration: none;
+          color: white; /* White text */
+          font-weight: bold;
+      }
+      .activities a:hover {
+          color: #cccccc; /* Light gray on hover */
+      }
+  </style>
 </head>
 <body>
   
@@ -13,7 +47,7 @@
   <header class="topBar">
     <h1 class="logo">PHILSEAS</h1>
     <nav class="navbar">
-    <ul>
+      <ul>
         <li><a href="home.php">HOME</a></li>
         <li><a href="about.php">ABOUT</a></li>
         <li><a href="market.php">MARKET</a></li>
@@ -21,14 +55,14 @@
         <li><a href="donations.php">DONATIONS</a></li>
         <li><a href="activities.php">ACTIVITIES</a></li>
         <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
-    </ul>
+      </ul>
     </nav>
   </header>
 
   <div class="container">
     <!-- Login -->
-    <div class="formContainer"  id="loginPop">
-      <span class="closelogin" onclick="closeForm()">&times</span>
+    <div class="formContainer" id="loginPop">
+      <span class="closelogin" onclick="closeForm()">&times;</span>
       <div class="loginForm-login">
         <h2>LOGIN</h2>
         <form action="">
@@ -54,29 +88,43 @@
 
     <!-- Activities Content -->
     <div class="activities-content">  
-    
-      <div class="activities-inline">
-        <div class="activities">
-          <a href="mangroves.php">MANGROVES PLANTING</a>
-        </div>
-        <div class="activities">
-          <a href="wasteCollect.php">WASTE COLLECTION</a>
-        </div>
-      </div>
-        
-      <div class="activities-inline">
-        <div class="activities">
-          <a href="algaePlant.php">SEAWEED AND ALGAE COLLECTION</a>
-        </div>
-        <div class="activities">
-          <a href="fishFeeding.php">FISH FEEDING</a>
-        </div>
-      </div>
-      
-    </div>
+      <?php
+      // Database connection details
+      $hostname = "localhost";
+      $username = "root";
+      $password = "";
+      $database = "webdev";
 
+      // Create connection
+      $conn = mysqli_connect($hostname, $username, $password, $database);
+
+      // Check connection
+      if (!$conn) {
+          die("Connection failed: " . mysqli_connect_error());
+      }
+
+      // Fetch data from activities table
+      $sql = "SELECT Act_ID, Act_name, Description, Image FROM activities";
+      $result = mysqli_query($conn, $sql);
+
+      if (mysqli_num_rows($result) > 0) {
+          // Output data of each row
+          while($row = mysqli_fetch_assoc($result)) {
+              echo '<div class="activities-inline">';
+              echo '<div class="activities">';
+              echo '<a href="actdetails.php?id=' . $row["Act_ID"] . '">' . $row["Act_name"] . '</a>';
+              echo '</div>';
+              echo '</div>';
+          }
+      } else {
+          echo "No activities found.";
+      }
+
+      // Close connection
+      mysqli_close($conn);
+      ?>
+    </div>
   </div>
-  
 
   <script>
     function openLogin() {

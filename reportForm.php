@@ -8,7 +8,6 @@
     <title>Report Form</title>
 </head>
 <body>
-    \
     <main>
         
         <div class="close-button">
@@ -16,42 +15,43 @@
         </div>
 
         <div class="form-container">
+            <!-- Form POST to the same file for handling submission -->
+            <form action="reportForm.php" method="POST">
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label for="name">NAME</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="date">DATE</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="contact">CONTACT NUMBER</label>
+                        <input type="text" id="contact" name="contact" required>
+                    </div>
+                </div>
             
-            <div class="form-row">
-                <div style="flex: 1;">
-                    <label for="name">NAME</label>
-                    <input type="text" id="name" name="name">
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label for="incident">TYPE OF INCIDENT</label>
+                        <input type="text" id="incident" name="incident" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="location">LOCATION</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
                 </div>
-                <div style="flex: 1;">
-                    <label for="date">DATE</label>
-                    <input type="text" id="date" name="date">
-                </div>
-                <div style="flex: 1;">
-                    <label for="contact">CONTACT NUMBER</label>
-                    <input type="text" id="contact" name="contact">
-                </div>
-            </div>
-        
-            <div class="form-row">
-                <div style="flex: 1;">
-                    <label for="incident">TYPE OF INCIDENT</label>
-                    <input type="text" id="incident" name="incident">
-                </div>
-                <div style="flex: 1;">
-                    <label for="location">LOCATION</label>
-                    <input type="text" id="location" name="location">
-                </div>
-            </div>
-        
-            <label for="description">DESCRIBE THE SITUATION</label>
-            <textarea id="description" name="description"></textarea>
-        
-            <div class="report-button" onclick="showPopup()">REPORT</div>
+            
+                <label for="description">DESCRIBE THE SITUATION</label>
+                <textarea id="description" name="description" required></textarea>
+            
+                <button type="submit" class="report-button">REPORT</button>
+            </form>
         </div>
 
     </main>
     
-
     <!-- Pop-up and Overlay -->
     <div class="overlay" id="overlay"></div>
     <div class="popup" id="popup">
@@ -72,3 +72,41 @@
     </script>
 </body>
 </html>
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Database connection details
+    $hostname = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "webdev";
+
+    // Create connection
+    $conn = mysqli_connect($hostname, $username, $password, $database);
+
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    // Collect form data
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+    $contact = $_POST['contact'];
+    $incident = $_POST['incident'];
+    $location = $_POST['location'];
+    $description = $_POST['description'];
+
+    // Insert form data into reports table
+    $sql = "INSERT INTO reports (Name, Date, Contact_no, Type_of_incident, Location, Description) VALUES ('$name', '$date', '$contact', '$incident', '$location', '$description')";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>showPopup();</script>";
+    } else {
+        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    }
+
+    // Close connection
+    mysqli_close($conn);
+}
+?>
