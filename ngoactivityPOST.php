@@ -194,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <main>
         <div class="form-container">
             <div class="close-button">
-                <a href="activities.php">&times;</a>
+                <a href="ngo-dashboard.php">&times;</a>
             </div>
             <h1>POST ACTIVITY</h1>
             <!-- Form POST to ngoactivityPOST.php for handling submission -->

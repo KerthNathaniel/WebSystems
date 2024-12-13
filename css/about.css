@@ -1,5 +1,5 @@
-.about-content{
-    font-size: 1.5em;
+.about-content p{
+    font-size: .5em;
     color: white;
 }
 
@@ -11,5 +11,7 @@
 
 .about-content ul li{
     margin-bottom: 20px;
-    list-style-type: none;
+    list-style-type: disc;
 }
+
+

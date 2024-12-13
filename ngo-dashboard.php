@@ -2,9 +2,19 @@
 // Connect to the database
 include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
 
-// Start the session
 session_start();
 
+// Check if the user is logged in and has the correct role
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: home.php");
+    exit();
+}
+
+// Ensure the user has the appropriate role
+if ($_SESSION['Role'] !== 'ngo') { // Change this role for each dashboard
+    header("Location: home.php");
+    exit();
+}
 // Retrieve user data based on logged-in User_ID
 if (isset($_SESSION['User_ID'])) {
     $user_id = $_SESSION['User_ID'];
@@ -23,6 +33,7 @@ if (isset($_SESSION['User_ID'])) {
         $address = htmlspecialchars($row['Address']);
         $contact = htmlspecialchars($row['Number']);
         $email = htmlspecialchars($row['Email_addr']);
+        //$profile_image = htmlspecialchars($row['Profile_Image']); // Assuming this stores the image URL
     } else {
         echo "<p>No user data found.</p>";
         exit();
@@ -33,7 +44,9 @@ if (isset($_SESSION['User_ID'])) {
     echo "<p>Please log in to view your profile.</p>";
     exit();
 }
+        
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,6 +74,7 @@ if (isset($_SESSION['User_ID'])) {
             justify-content: center;
             position: relative;
             overflow: hidden; /* To keep the container size fixed */
+            margin-bottom: 20px;
         }
         .profile-container h1, .donation-log-container h1, .activities-container h1, .joined-activities-container h1, .activity-participants-container h1, .donators-list-container h1 {
             font-size: 20px;
@@ -129,39 +143,66 @@ if (isset($_SESSION['User_ID'])) {
             justify-content: flex-end;
             gap: 5px;
         }
+
+        .logoutbtn {
+            background-color: #f44336; /* Red color for logout */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logoutbtn:hover {
+            background-color: #d32f2f;
+        }
     </style>
 </head>
 <body>
     <header class="topBar">
         <h1 class="logo">PHILSEAS</h1>
         <nav class="navbar">
-            <ul>
-                <li><a href="home.php">HOME</a></li>
-                <li><a href="about.php">ABOUT</a></li>
-                <li><a href="market.php">MARKET</a></li>
-                <li><a href="report.php">REPORTS</a></li>
-                <li><a href="donations.php">DONATIONS</a></li>
-                <li><a href="activities.php">ACTIVITIES</a></li>
+        <ul>
+            <li><a href="home.php">HOME</a></li>
+            <li><a href="about.php">ABOUT</a></li>
+            <li><a href="market.php">MARKET</a></li>
+            <li><a href="report.php">REPORTS</a></li>
+            <li><a href="donations.php">DONATIONS</a></li>
+            <li><a href="activities.php">ACTIVITIES</a></li>
+            
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logoutbtn">LOGOUT</button>
+                    </form>
+                </li>
+            <?php else: ?>
+                <!-- Fallback to login button -->
                 <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
-            </ul>
+            <?php endif; ?>
+        </ul>
         </nav>
     </header>
-    <div class="container">
-        <div class="profile-container">
-            <h1>Non Government Organization</h1>
-            <img src="pic.png" alt="Profile Picture">
-            <a href="editProfile.php" class="edit-link">edit</a>
-            <div class="profile-info">
-                <div><span>Username:</span> <?php echo $name; ?></div>
-                <div><span>Address:</span> <?php echo $address; ?></div>
-                <div><span>Contact Info:</span> <?php echo $contact; ?></div>
-                <div><span>Email Address:</span> <?php echo $email; ?></div>
-            </div>
-            <div class="add-button">
-                <a href="ngoactivityPOST.php"><img src="icon/icons8-add-30.png" alt="Add"></a>
-            </div>
+
+    <div class="profile-container">
+        
+        
+        <h1><?php echo $name; ?></h1>
+        <img src="pic.png" alt="Profile Picture">
+        <a href="editProfile.php" class="edit-link">edit</a>
+        <div class="profile-info">
+            <div><span>Company Name:</span> <?php echo $name; ?></div>
+            <div><span>Address:</span> <?php echo $address; ?></div>
+            <div><span>Contact Info:</span> <?php echo $contact; ?></div>
+            <div><span>Email Address:</span> <?php echo $email; ?></div>
         </div>
-        <div class="donation-log-container">
+        <div class="add-button">
+                <a href="ngoactivityPOST.php"><img src="icon/icons8-add-30.png" alt="Add"></a>
+        </div>
+    </div>
+    <div class="donation-log-container">
             <h1>Donation Log</h1>
             <div class="donation-log">
                 <?php
@@ -308,8 +349,5 @@ if (isset($_SESSION['User_ID'])) {
                 ?>
             </div>
         </div>
-
-            </div>
-        </body>
-        </html>
-        
+</body>
+</html>

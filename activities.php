@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+// Check if the user is logged in and has the correct role
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: home.php");
+    exit();
+}
+
+// Ensure the user has the appropriate role
+if (!in_array($_SESSION['Role'], ['ngo', 'consumer', 'seller'])) {
+  header("Location: home.php");
+  exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +23,7 @@
   <link rel="stylesheet" href="css/navBar.css">
   <link rel="stylesheet" href="css/activities.css">
   <style>
-      .activities-content {
+    .activities-content {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
@@ -39,6 +55,20 @@
       .activities a:hover {
           color: #cccccc; /* Light gray on hover */
       }
+    .logoutbtn {
+            background-color: #f44336; /* Red color for logout */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logoutbtn:hover {
+            background-color: #d32f2f;
+        }
   </style>
 </head>
 <body>
@@ -47,22 +77,31 @@
   <header class="topBar">
     <h1 class="logo">PHILSEAS</h1>
     <nav class="navbar">
-      <ul>
+    <ul>
         <li><a href="home.php">HOME</a></li>
         <li><a href="about.php">ABOUT</a></li>
         <li><a href="market.php">MARKET</a></li>
         <li><a href="report.php">REPORTS</a></li>
         <li><a href="donations.php">DONATIONS</a></li>
         <li><a href="activities.php">ACTIVITIES</a></li>
-        <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
-      </ul>
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logoutbtn">LOGOUT</button>
+                    </form>
+                </li>
+            <?php else: ?>
+                <!-- Fallback to login button -->
+                <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+            <?php endif; ?>
+    </ul>
     </nav>
   </header>
 
   <div class="container">
     <!-- Login -->
-    <div class="formContainer" id="loginPop">
-      <span class="closelogin" onclick="closeForm()">&times;</span>
+    <div class="formContainer"  id="loginPop">
+      <span class="closelogin" onclick="closeForm()">&times</span>
       <div class="loginForm-login">
         <h2>LOGIN</h2>
         <form action="">
@@ -124,7 +163,9 @@
       mysqli_close($conn);
       ?>
     </div>
+
   </div>
+  
 
   <script>
     function openLogin() {

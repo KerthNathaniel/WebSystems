@@ -1,49 +1,49 @@
 <?php
-// Start the session
+include 'dbconn.php';
 session_start();
 
+// Check if the user is logged in and has the correct role
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: home.php");
+    exit();
+}
+
+// Ensure the user has the appropriate role
+if (!in_array($_SESSION['Role'], ['ngo', 'consumer', 'seller'])) {
+  header("Location: home.php");
+  exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection details
-    $hostname = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "webdev";
 
-    // Create connection
-    $conn = mysqli_connect($hostname, $username, $password, $database);
+  // Collect form data
+  $gcashnum = $_POST['gcashnum'];
+  $amount = $_POST['amount'];
+  $activity = $_POST['activity'];
+  // Use the logged-in user's User_ID from the session
+  if (isset($_SESSION['User_ID'])) {
+      $user_id = $_SESSION['User_ID'];
+  } else {
+      die("Error: User not logged in.");
+  }
 
-    // Check connection
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
+  // Insert form data into donations table
+  $sql = "INSERT INTO donations (Amount, number, Act_ID, User_ID) VALUES ('$amount', '$gcashnum', '$activity', '$user_id')";
 
-    // Collect form data
-    $gcashnum = $_POST['gcashnum'];
-    $amount = $_POST['amount'];
-    $activity = $_POST['activity'];
-    // Use the logged-in user's User_ID from the session
-    if (isset($_SESSION['User_ID'])) {
-        $user_id = $_SESSION['User_ID'];
-    } else {
-        die("Error: User not logged in.");
-    }
+  if (mysqli_query($conn, $sql)) {
+      // Redirect to avoid re-submitting the form on page refresh
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit();
+  } else {
+      echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+  }
 
-    // Insert form data into donations table
-    $sql = "INSERT INTO donations (Amount, number, Act_ID, User_ID) VALUES ('$amount', '$gcashnum', '$activity', '$user_id')";
-
-    if (mysqli_query($conn, $sql)) {
-        // Redirect to avoid re-submitting the form on page refresh
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    } else {
-        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-    }
-
-    // Close connection
-    mysqli_close($conn);
+  // Close connection
+  mysqli_close($conn);
 }
 ?>
 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,21 +52,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="css/navBar.css">
     <link rel="stylesheet" href="css/donations.css">
     <title>Donations</title>
-    <style>
-        .announcement {
-            text-align: center;
-            background: #f0f0f0;
-            padding: 20px;
-            border: 1px solid #ccc;
-            margin: 20px auto;
-            width: 80%;
-            border-radius: 10px;
-        }
-    </style>
 </head>
 <style>
+  main{
+    height: 90%;
+  }
   .donateForm {
-    width: 250px;
+    width: 650px;
     padding: 20px;
     border: 2px solid #fff;
     border-radius: 20px;
@@ -77,6 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     max-height: 400px; /* Set a maximum height */
     transition: .3s;
     color: white;
+    margin-top: 20px;
   }
   .closeDonate {
     color: white;
@@ -112,6 +105,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     max-height: 200px; /* Set a maximum height for the list */
     overflow-y: auto; /* Make the list scrollable */
   }
+  .text-donate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px; /* Space between inputs */
+  }
+  .text-donate input {
+      width: 48%; /* Adjust width to fit inline */
+  }
+  .announcement {
+            text-align: center;
+            background: #f0f0f0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            width: 80%;
+            border-radius: 10px;
+  }
+  .logoutbtn {
+      background-color: #f44336; /* Red color for logout */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+  }
+
+  .logoutbtn:hover {
+      background-color: #d32f2f;
+  }
 </style>
 <body>
     
@@ -126,7 +151,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <li><a href="report.php">REPORTS</a></li>
           <li><a href="donations.php">DONATIONS</a></li>
           <li><a href="activities.php">ACTIVITIES</a></li>
-          <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+          <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logoutbtn">LOGOUT</button>
+                    </form>
+                </li>
+            <?php else: ?>
+                <!-- Fallback to login button -->
+                <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+            <?php endif; ?>
         </ul>
       </nav>
     </header>
@@ -186,42 +220,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </ul>
         <button class="donate-button" onclick="openDonate()">DONATE</button>
       </div>
-    </main>
 
-    <div class="donateForm" id="donateForm">
+      <div class="donateForm" id="donateForm">
       <span class="closeDonate" onclick="closeDonate()">&times;</span>
       <div class="donation">
         <!-- Form POST to the same file for handling submission -->
         <form action="donations.php" method="POST">
           <h4>Donate through GCash:</h4>
-          <label for="gcashnum">Gcash Number</label>
-          <input type="text" name="gcashnum" id="gcashnum" required>
-          <label for="amount">Amount</label>
-          <input type="number" name="amount" id="amount" required>
-          <label for="activity">Activity</label>
-          <select name="activity" id="activity" required>
-            <?php
-            // Fetch activities from the database to populate the dropdown
-            $conn = mysqli_connect($hostname, $username, $password, $database);
-            if (!$conn) {
-                die("Connection failed: " . mysqli_connect_error());
-            }
-            $sql = "SELECT Act_ID, Act_name FROM activities";
-            $result = mysqli_query($conn, $sql);
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<option value='" . $row['Act_ID'] . "'>" . $row['Act_name'] . "</option>";
-                }
-            } else {
-                echo "<option value=''>No activities available</option>";
-            }
-            mysqli_close($conn);
-            ?>
-          </select>
+          <div class="text-donate">
+            <label for="gcashnum">Gcash Number</label>
+            <input type="text" name="gcashnum" id="gcashnum" required>
+            <label for="amount">Amount</label>
+            <input type="number" name="amount" id="amount" required>
+          </div>
+          <div class="select-donate">
+            <label for="activity">Activity</label>
+            <select name="activity" id="activity" required>
+              <?php
+              // Fetch activities from the database to populate the dropdown
+              $conn = mysqli_connect($hostname, $username, $password, $database);
+              if (!$conn) {
+                  die("Connection failed: " . mysqli_connect_error());
+              }
+              $sql = "SELECT Act_ID, Act_name FROM activities";
+              $result = mysqli_query($conn, $sql);
+              if (mysqli_num_rows($result) > 0) {
+                  while ($row = mysqli_fetch_assoc($result)) {
+                      echo "<option value='" . $row['Act_ID'] . "'>" . $row['Act_name'] . "</option>";
+                  }
+              } else {
+                  echo "<option value=''>No activities available</option>";
+              }
+              mysqli_close($conn);
+              ?>
+            </select>
+          </div>
+          
           <button type="submit">Send</button>
         </form>
       </div>
     </div>
+    </main>
+
+    
 
     <script>
       function openDonate() {
@@ -230,7 +271,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       function closeDonate() {
         document.getElementById("donateForm").style.visibility = "hidden";
       }
+      
     </script>
+      
 </body>
 </html>
-

@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+// Check if the user is logged in and has the correct role
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: home.php");
+    exit();
+}
+
+// Ensure the user has the appropriate role
+if ($_SESSION['Role'] !== 'consumer') { // Change this role for each dashboard
+    header("Location: home.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,18 +26,22 @@
         .container {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             gap: 20px;
             margin-top: 20px;
+            border: 2px solid;
         }
         .profile-container, .donation-log-container, .activities-container {
             background: #3f51b5;
             padding: 20px;
             border-radius: 15px;
             width: 600px;
+            height: 30%;
             box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
             justify-content: center;
+            margin-bottom: 20px;
         }
         .profile-container h1, .donation-log-container h1, .activities-container h1 {
             font-size: 24px;
@@ -47,6 +67,22 @@
         .profile-info div span, .donation-log div span, .activities-list div span {
             font-weight: bold;
         }
+
+        .logoutbtn {
+            background-color: #f44336; /* Red color for logout */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logoutbtn:hover {
+            background-color: #d32f2f;
+        }
+
     </style>
 </head>
 <body>
@@ -60,130 +96,134 @@
             <li><a href="report.php">REPORTS</a></li>
             <li><a href="donations.php">DONATIONS</a></li>
             <li><a href="activities.php">ACTIVITIES</a></li>
-            <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logoutbtn">LOGOUT</button>
+                    </form>
+                </li>
+            <?php else: ?>
+                <!-- Fallback to login button -->
+                <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+            <?php endif; ?>
         </ul>
         </nav>
     </header>
 
-    <div class="container">
-        <div class="profile-container">
-            <?php
-            // Connect to the database
-            include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
+    <div class="profile-container">
+        <?php
+        // Connect to the database
+        include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
 
-            // Start the session
-            session_start();
+        // Retrieve user data based on logged-in User_ID
+        if (isset($_SESSION['User_ID'])) {
+            $user_id = $_SESSION['User_ID'];
 
-            // Retrieve user data based on logged-in User_ID
-            if (isset($_SESSION['User_ID'])) {
-                $user_id = $_SESSION['User_ID'];
+            // Query to fetch user information
+            $sql = "SELECT Username, Email_addr, Number, Address FROM users WHERE User_ID = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "i", $user_id);
+            mysqli_stmt_execute($stmt);
 
-                // Query to fetch user information
-                $sql = "SELECT Username, Email_addr, Number, Address FROM users WHERE User_ID = ?";
-                $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "i", $user_id);
-                mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-                $result = mysqli_stmt_get_result($stmt);
-
-                if ($row = mysqli_fetch_assoc($result)) {
-                    // Display user information
-                    $name = htmlspecialchars($row['Username']);
-                    $address = htmlspecialchars($row['Address']);
-                    $contact = htmlspecialchars($row['Number']);
-                    $email = htmlspecialchars($row['Email_addr']);
-                    //$profile_image = htmlspecialchars($row['Profile_Image']); // Assuming this stores the image URL
-                } else {
-                    echo "<p>No user data found.</p>";
-                    exit();
-                }
-
-                mysqli_stmt_close($stmt);
+            if ($row = mysqli_fetch_assoc($result)) {
+                // Display user information
+                $name = htmlspecialchars($row['Username']);
+                $address = htmlspecialchars($row['Address']);
+                $contact = htmlspecialchars($row['Number']);
+                $email = htmlspecialchars($row['Email_addr']);
+                //$profile_image = htmlspecialchars($row['Profile_Image']); // Assuming this stores the image URL
             } else {
-                echo "<p>Please log in to view your profile.</p>";
+                echo "<p>No user data found.</p>";
                 exit();
             }
 
-            mysqli_close($conn);
-            ?>
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "<p>Please log in to view your profile.</p>";
+            exit();
+        }
 
-            <h1>Consumer</h1>
-            <img src="pic.png" alt="Profile Picture">
-            <a href="editProfile.php" class="edit-link">edit</a>
-            <div class="profile-info">
-                <div><span>Username:</span> <?php echo $name; ?></div>
-                <div><span>Address:</span> <?php echo $address; ?></div>
-                <div><span>Contact Info:</span> <?php echo $contact; ?></div>
-                <div><span>Email Address:</span> <?php echo $email; ?></div>
-            </div>
+        mysqli_close($conn);
+        ?>
+        
+        <h1><?php echo $name; ?></h1>
+        <img src="pic.png" alt="Profile Picture">
+        <a href="editProfile.php" class="edit-link">edit</a>
+        <div class="profile-info">
+            <div><span>Username:</span> <?php echo $name; ?></div>
+            <div><span>Address:</span> <?php echo $address; ?></div>
+            <div><span>Contact Info:</span> <?php echo $contact; ?></div>
+            <div><span>Email Address:</span> <?php echo $email; ?></div>
         </div>
+        </div>
+            <div class="donation-log-container">
+                <h1>Donation Log</h1>
+                <div class="donation-log">
+                    <?php
+                    // Connect to the database
+                    include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
 
-        <div class="donation-log-container">
-            <h1>Donation Log</h1>
-            <div class="donation-log">
-                <?php
-                // Connect to the database
-                include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
+                    // Fetch the list of donations for the logged-in user
+                    $sql = "SELECT d.Amount, a.Act_name 
+                            FROM donations d 
+                            JOIN activities a ON d.Act_ID = a.Act_ID 
+                            WHERE d.User_ID = ? 
+                            ORDER BY d.Donate_ID DESC";
+                    $stmt = mysqli_prepare($conn, $sql);
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
 
-                // Fetch the list of donations for the logged-in user
-                $sql = "SELECT d.Amount, a.Act_name 
-                        FROM donations d 
-                        JOIN activities a ON d.Act_ID = a.Act_ID 
-                        WHERE d.User_ID = ? 
-                        ORDER BY d.Donate_ID DESC";
-                $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "i", $user_id);
-                mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
 
-                $result = mysqli_stmt_get_result($stmt);
-
-                if (mysqli_num_rows($result) > 0) {
-                    while($row = mysqli_fetch_assoc($result)) {
-                        echo "<div><span>Donated:</span> " . htmlspecialchars($row['Amount']) . " PHP to <strong>" . htmlspecialchars($row['Act_name']) . "</strong></div>";
+                    if (mysqli_num_rows($result) > 0) {
+                        while($row = mysqli_fetch_assoc($result)) {
+                            echo "<div><span>Donated:</span> " . htmlspecialchars($row['Amount']) . " PHP to <strong>" . htmlspecialchars($row['Act_name']) . "</strong></div>";
+                        }
+                    } else {
+                        echo "<div>No donations found.</div>";
                     }
-                } else {
-                    echo "<div>No donations found.</div>";
-                }
 
-                mysqli_stmt_close($stmt);
-                mysqli_close($conn);
-                ?>
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($conn);
+                    ?>
+                </div>
             </div>
-        </div>
+            <div class="activities-container">
+                <h1>Activities</h1>
+                <div class="activities-list">
+                    <?php
+                    // Connect to the database
+                    include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
 
-        <div class="activities-container">
-            <h1>Activities</h1>
-            <div class="activities-list">
-                <?php
-                // Connect to the database
-                include 'dbconn.php'; // Ensure this file has the $conn variable for database connection
+                    // Fetch the list of activities for the logged-in user
+                    $sql = "SELECT a.Act_name 
+                            FROM activities
+                                                    a 
+                            JOIN user_activities ua ON a.Act_ID = ua.Act_ID 
+                            WHERE ua.User_ID = ? 
+                            ORDER BY ua.Participation_ID DESC";
+                    $stmt = mysqli_prepare($conn, $sql);
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
 
-                // Fetch the list of activities for the logged-in user
-                $sql = "SELECT a.Act_name 
-                        FROM activities
-                                                a 
-                        JOIN user_activities ua ON a.Act_ID = ua.Act_ID 
-                        WHERE ua.User_ID = ? 
-                        ORDER BY ua.Participation_ID DESC";
-                $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "i", $user_id);
-                mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
 
-                $result = mysqli_stmt_get_result($stmt);
-
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<div><span>Participated in:</span> " . htmlspecialchars($row['Act_name']) . "</div>";
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<div><span>Participated in:</span> " . htmlspecialchars($row['Act_name']) . "</div>";
+                        }
+                    } else {
+                        echo "<div>No activities found.</div>";
                     }
-                } else {
-                    echo "<div>No activities found.</div>";
-                }
 
-                mysqli_stmt_close($stmt);
-                mysqli_close($conn);
-                ?>
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($conn);
+                    ?>
+                </div>
             </div>
-        </div>
-    </div>
+
 </body>
 </html>

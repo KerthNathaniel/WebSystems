@@ -1,3 +1,29 @@
+<?php
+include 'dbconn.php';
+session_start();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Collect form data
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+    $contact = $_POST['contact'];
+    $incident = $_POST['incident'];
+    $location = $_POST['location'];
+    $description = $_POST['description'];
+
+    // Insert form data into reports table
+    $sql = "INSERT INTO reports (Name, Date, Contact_no, Type_of_incident, Location, Description) VALUES ('$name', '$date', '$contact', '$incident', '$location', '$description')";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>showPopup();</script>";
+    } else {
+        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    }
+
+    // Close connection
+    mysqli_close($conn);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,40 +99,4 @@
 </body>
 </html>
 
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection details
-    $hostname = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "webdev";
 
-    // Create connection
-    $conn = mysqli_connect($hostname, $username, $password, $database);
-
-    // Check connection
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Collect form data
-    $name = $_POST['name'];
-    $date = $_POST['date'];
-    $contact = $_POST['contact'];
-    $incident = $_POST['incident'];
-    $location = $_POST['location'];
-    $description = $_POST['description'];
-
-    // Insert form data into reports table
-    $sql = "INSERT INTO reports (Name, Date, Contact_no, Type_of_incident, Location, Description) VALUES ('$name', '$date', '$contact', '$incident', '$location', '$description')";
-
-    if (mysqli_query($conn, $sql)) {
-        echo "<script>showPopup();</script>";
-    } else {
-        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-    }
-
-    // Close connection
-    mysqli_close($conn);
-}
-?>

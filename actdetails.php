@@ -1,3 +1,18 @@
+<?php
+    session_start();
+
+    // Check if the user is logged in and has the correct role
+    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+        header("Location: home.php");
+        exit();
+    }
+    
+    // Ensure the user has the appropriate role
+    if (!in_array($_SESSION['Role'], ['ngo', 'consumer', 'seller'])) {
+      header("Location: home.php");
+      exit();
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +21,22 @@
     <title>Activity Details</title>
     <link rel="stylesheet" href="css/navBar.css">
     <link rel="stylesheet" href="css/activity-content.css">
+    <style>
+        .logoutbtn {
+            background-color: #f44336; /* Red color for logout */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .logoutbtn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
     
@@ -20,17 +51,25 @@
             <li><a href="report.php">REPORTS</a></li>
             <li><a href="donations.php">DONATIONS</a></li>
             <li><a href="activities.php">ACTIVITIES</a></li>
-            <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logoutbtn">LOGOUT</button>
+                    </form>
+                </li>
+            <?php else: ?>
+                <!-- Fallback to login button -->
+                <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+            <?php endif; ?>
         </ul>
         </nav>
     </header>
 
     <div class="main-content">
         <?php
-        // Start the session
-        session_start();
 
-        // Check if User_ID is set in the session
+        // Fetch the username from the session
+        $username = isset($_SESSION['Username']) ? $_SESSION['Username'] : '';
         if (isset($_SESSION['User_ID'])) {
             $user_id = $_SESSION['User_ID'];
 

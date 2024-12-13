@@ -1,3 +1,21 @@
+<?php
+  session_start();
+  $is_logged_in = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+  $user_role = $_SESSION['Role'] ?? null; // Fetch the role from the session
+  $profile_link = '#'; // Default link in case of error
+
+  // Set the profile link based on the user's role
+  if ($user_role === 'consumer') {
+      $profile_link = 'consumer-dashboard.php';
+  } elseif ($user_role === 'seller') {
+      $profile_link = 'seller-dashboard.php';
+  } elseif ($user_role === 'ngo') {
+      $profile_link = 'ngo-dashboard.php';
+  }
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +33,7 @@
     background-position-y: bottom;
     background-position-x: right;
     }
+
   </style>
   
 </head>
@@ -31,7 +50,21 @@
         <li><a href="report.php">REPORTS</a></li>
         <li><a href="donations.php">DONATIONS</a></li>
         <li><a href="activities.php">ACTIVITIES</a></li>
-        <li><button class="loginbtn" onclick="openLogin()">LOGIN</button></li>
+
+        <?php if ($is_logged_in): ?>
+          <!-- Show profile icon if logged in -->
+          <li>
+            <a href="<?php echo $profile_link; ?>" class="profile-icon" title="Go to Dashboard">
+              👤
+            </a>
+          </li>
+        <?php else: ?>
+          <!-- Show login button if not logged in -->
+          <li>
+            <button class="loginbtn" onclick="openLogin()">LOGIN</button>
+          </li>
+        <?php endif; ?>
+        
       </ul>
     </nav>
   </header>
